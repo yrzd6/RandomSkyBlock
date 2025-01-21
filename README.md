@@ -12,3 +12,10 @@ MinecraftBE ScriptAPI Random Skyblock.
 + `#set <time: number>` 设置每次方块随机的时间。
 + `#next <BlockID: string>` 指定下一次随机的方块。
 + `#next reset` 取消指定下一次随机的方块。
+
+
+## Star 历史 
+
+[![Star History Chart](https://api.star-history.com/svg?repos=yrzd6/RandomBlock&type=Date)](https://star-history.com/#yrzd6/RandomBlock&Date)
+
+（应该没什么人）
