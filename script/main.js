@@ -1,6 +1,6 @@
 import { system, world, BlockTypes } from "@minecraft/server"
 
-//全局量，简化代码
+// 全局量，简化代码
 const overworld = world.getDimension("overworld");
 
 
