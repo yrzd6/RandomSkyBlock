@@ -15,3 +15,13 @@ MinecraftBE ScriptAPI Random Skyblock.
 + `#timer <time: number>` 设置当前计时器时间。
 
 可在代码中自定义判断 OP 权限玩家的函数，函数检测返回值为`false`的玩家无法使用`#c`、`#next`命令。
+
+## Star 历史
+
+<a href="https://star-history.com/#yrzd6/RandomSkyBlock&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=yrzd6/RandomSkyBlock&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=yrzd6/RandomSkyBlock&type=Date" />
+   <img alt="Star 历史图表" src="https://api.star-history.com/svg?repos=yrzd6/RandomSkyBlock&type=Date" />
+ </picture>
+</a>
