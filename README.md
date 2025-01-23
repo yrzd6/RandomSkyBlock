@@ -9,7 +9,7 @@ MinecraftBE ScriptAPI Random Skyblock.
 ## Commands
 
 + `#c` 立即随机一次方块。
-+ `#set <time: number>` 设置每次方块随机的时间。
++ `#set <time: number>` 设置每次方块随机变换的时间。
 + `#next <BlockID: string>` 指定下一次随机的方块。
 + `#next reset` 取消指定下一次随机的方块。
 + `#timer <time: number>` 设置当前计时器时间。
