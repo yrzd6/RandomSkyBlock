@@ -14,9 +14,3 @@ MinecraftBE ScriptAPI Random Skyblock.
 + `#next reset` 取消指定下一次随机的方块。
 
 可在代码中自定义判断 OP 权限玩家的函数，函数检测返回值为`false`的玩家无法使用`#c`、`#next`命令。
-
-## Star 历史 
-
-![Star History Chart](https://api.star-history.com/svg?repos=yrzd6/RandomBlock&type=Date)]
-
-（应该没什么人）
