@@ -17,6 +17,6 @@ MinecraftBE ScriptAPI Random Skyblock.
 
 ## Star 历史 
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yrzd6/RandomBlock&type=Date)](https://star-history.com/#yrzd6/RandomBlock&Date)
+![Star History Chart](https://api.star-history.com/svg?repos=yrzd6/RandomBlock&type=Date)]
 
 （应该没什么人）
