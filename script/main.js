@@ -17,7 +17,12 @@ const BlackListBlocks = [
     /light_block/, // 光源方块
     /rail/, // 铁轨
     /torchflower/, // 火把花
-    /structure/ // 结构空位，结构方块
+    /structure/, // 结构空位，结构方块
+    /candle/, // 蜡烛（带蜡烛的蛋糕）
+    /plate/, // 压力板
+    /waterlily/, // 睡莲
+    /poppy/, // 虞美人
+    /sapling/ // 树苗
 ]
 
 // 更新方块列表
@@ -45,8 +50,8 @@ function randomBlock() {
 }
 
 function ChangeBlocks() {
-    var Debugblocks = [];
-    let BlockID = randomBlock();
+    var Debugblocks = []; // 仅供测试
+    let BlockID = randomBlock(); // 随机抽取方块
 
 
     try {
@@ -68,12 +73,12 @@ function Init() {
     if (InitFlag) return;
     Timer = ChangeTimes;
     InitFlag = true;
-    system.runInterval(() => Start(), 20)
+    system.runInterval(() => Start(), 20); // 主循环
 }
 
 function Start() {
 
-    let Progress = parseInt((ChangeTimes - Timer) / ChangeTimes * 12);
+    let Progress = parseInt((ChangeTimes - Timer + 1) / ChangeTimes * 12); // 计算进度
     let ProgressBar = "§a" + "█".repeat(Progress) + "§f" + "█".repeat(12 - Progress);
 
     overworld.runCommand(`titleraw @a actionbar {"rawtext": [{"text":"距离方块变换还有 ${Timer} 秒。\n${ProgressBar}"}]}`);
@@ -86,22 +91,37 @@ function Start() {
     }
 };
 
+function CheckIsOp(player) { // 这个函数用于检测玩家是否是管理员，非管理员不能用 #c、#next 指令
+    return 1; 
+}
 
 world.beforeEvents.chatSend.subscribe((msg) => {
+    let IsSenderOp = CheckIsOp(msg.sender); // 检查是否是管理员
     if (msg.message == "#c") {
         msg.cancel = true;
-        Timer = 0;
-        msg.sender.sendMessage("已重新随机生成方块。");
+        if (IsSenderOp) {
+            Timer = 0;
+            msg.sender.sendMessage("已重新随机生成方块。");
+        }
+        else {
+            msg.sender.sendMessage("您不是管理员!");
+        }
     }
     if (msg.message.startsWith(`#next `)) {
         msg.cancel = true;
-        nextBlock = msg.message.substring(6).trim();
-        if (nextBlock == "reset") {
-            nextBlock = null;
-            msg.sender.sendMessage("已取消设置下一个方块。");
-            return;
+        if (IsSenderOp) {
+            nextBlock = msg.message.substring(6).trim();
+            if (nextBlock == "reset") {
+                nextBlock = null;
+                msg.sender.sendMessage("已取消设置下一个方块。");
+                return;
+            }
+            msg.sender.sendMessage(`成功设置下一个方块为 ${nextBlock}。`);
         }
-        msg.sender.sendMessage(`成功设置下一个方块为 ${nextBlock}。`);
+        else {
+            msg.sender.sendMessage("您不是管理员!");
+        }
+
     }
     if (msg.message.startsWith(`#set `)) {
         msg.cancel = true;
