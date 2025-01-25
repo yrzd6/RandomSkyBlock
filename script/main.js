@@ -79,12 +79,19 @@ function Init() {
 function Start() {
 
     let Progress = parseInt((ChangeTimes - Timer + 1) / ChangeTimes * 12); // 计算进度
+    let ProgressBar = "§m" + "█".repeat(12);
     if(Progress < 0)
         Progress = 0; // 防止溢出
-    
-    let ProgressBar = "§a" + "█".repeat(Progress) + "§f" + "█".repeat(12 - Progress);
+    if(Progress > 12)
+        Progress = 12;
+    try{ //防止 repeat 问题
+        ProgressBar = "§a" + "█".repeat(Progress) + "§f" + "█".repeat(12 - Progress);
+    }
+    catch(e){
+        console.error(e);
+        console.warn(`进度: ${Progress}`);
+    }
     overworld.runCommand(`titleraw @a actionbar {"rawtext": [{"text":"距离方块变换还有 ${Timer}/${ChangeTimes} 秒。\n${ProgressBar}"}]}`);
-
 
     Timer -= 1;
     if (Timer == -1) {
@@ -145,7 +152,6 @@ world.beforeEvents.chatSend.subscribe((msg) => {
             }
             Timer = NewTimer;
             world.sendMessage(`成功设置计时器时间为 ${NewTimer} 秒。`);
-            world.sendMessage({ "translate": "item.boat.big_oak.name" });
         }
         else {
             msg.sender.sendMessage("您不是管理员!");
