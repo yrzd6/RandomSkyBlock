@@ -1,4 +1,5 @@
 import { system, world, BlockTypes } from "@minecraft/server"
+import { MessageFormData } from "@minecraft/server-ui"
 
 // 全局量，简化代码
 const overworld = world.getDimension("overworld");
@@ -100,9 +101,36 @@ function Start() {
     }
 };
 
+function teleportWindows(fromplayer, toplayer) {
+    let ACtionForm = new ActionFormData()
+    ACtionForm.title("这是窗口标题")
+        .body("窗口内容")
+        .button("选项1", "这里填材质的路径")
+        .button("选项2，调用函数", "textures/items/potato")
+        .button("选项3，调用函数", "textures/items/apple")
+        .button("密码验证", "textures/ui/gear")
+    ACtionForm.show(player).then(t => {
+        if (t.selection == 0) {
+            overworld.runCommandAsync(`say 这里是从0开始selection[0]代表是选项1`)
+        }
+        if (t.selection == 1) {
+            overworld.runCommandAsync(`say 选项2`)
+            MessageFormTest(player)//调用函数MessageFormTest
+        } 
+        if (t.selection == 2) {
+            ModalFormTest(player)//调用函数ModalFormTest
+        }
+        if (t.selection == 3) {
+            Verify(player)//调用函数Verify
+        }
+    })
+};
+
 function CheckIsOp(player) { // 这个函数用于检测玩家是否是管理员，非管理员不能用 #c、#next 指令
     return 1;
 }
+
+
 world.beforeEvents.chatSend.subscribe((msg) => {
     let IsSenderOp = CheckIsOp(msg.sender); // 检查是否是管理员
     if (msg.message == "#c") {
