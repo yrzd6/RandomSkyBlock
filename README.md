@@ -18,7 +18,7 @@ MinecraftBE ScriptAPI Random Skyblock.
 
 ## 计划
 - [x] 添加 `#timer` 命令。
-- [ ] 添加 `#tp` 命令供无权限的人传送之其他人（需要其他人同意）。
+- [ ] 添加 `#tp` 命令供无权限的人请求传送至其他人。
 - [ ] 添加 op 检测。
 
 ## Star 历史
