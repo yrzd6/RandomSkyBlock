@@ -16,6 +16,8 @@ MinecraftBE ScriptAPI Random Skyblock.
 
 可在代码中自定义判断 OP 权限玩家的函数，函数检测返回值为`false`的玩家无法使用`#c`、`#next`命令。
 
+当前思路：以玩家身份攻击 npc 检测。
+
 ## Star 历史
 
 <a href="https://star-history.com/#yrzd6/RandomSkyBlock&Date">
