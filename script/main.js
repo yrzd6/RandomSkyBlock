@@ -188,4 +188,4 @@ world.beforeEvents.chatSend.subscribe((msg) => {
 });
 
 
-system.runTimeout(() => Init(), 10);
+system.runTimeout(() => Init(), 8);
