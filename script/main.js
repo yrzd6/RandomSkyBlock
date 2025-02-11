@@ -1,6 +1,7 @@
 import { system, world, BlockTypes } from "@minecraft/server"
 import { MessageFormData } from "@minecraft/server-ui"
 
+// 添加声明
 // 全局量，简化代码
 const overworld = world.getDimension("overworld");
 
