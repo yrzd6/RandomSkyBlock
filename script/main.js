@@ -1,16 +1,15 @@
 import { system, world, BlockTypes } from "@minecraft/server"
-import { MessageFormData } from "@minecraft/server-ui"
+import { ActionFormData, MessageFormData, uiManager } from "@minecraft/server-ui"
+import { CheckIsOp } from "./CheckOp"
 
-// 添加声明
 // 全局量，简化代码
 const overworld = world.getDimension("overworld");
 
-
 // 获取方块列表
-var AllBlocks = BlockTypes.getAll().map(element => element.id).sort();
+var allBlocks = BlockTypes.getAll().map(element => element.id).sort();
 
 // 黑名单
-const BlackListBlocks = [
+const blackListBlocks = [
     /sign/, // 告示牌
     /button/, // 按钮
     /door/, // 门
@@ -28,22 +27,20 @@ const BlackListBlocks = [
 ]
 
 // 更新方块列表
-const Blocks = AllBlocks.filter(item => {
+const blocks = allBlocks.filter(item => {
     // 检查item是否与任何一个正则表达式匹配
-    return !BlackListBlocks.some(pattern => pattern.test(item));
+    return !blackListBlocks.some(pattern => pattern.test(item));
 });
 
-var nextBlock = null;
-var ChangeTimes = 60;
+var nextBlock = null; // 下一个方块
+var changeTimes = 120; // 默认改变时间
 
-var Timer = 0;
-var InitFlag = false;
-
-
+var timer = 0; // 计时器
+var initFlag = false; // 是否初始化
 
 function randomBlock() {
     if (nextBlock == null)
-        return Blocks[Math.floor(Math.random() * Blocks.length)];
+        return blocks[Math.floor(Math.random() * blocks.length)];
     else {
         let returnBlock = nextBlock;
         nextBlock = null;
@@ -51,142 +48,139 @@ function randomBlock() {
     }
 }
 
-function ChangeBlocks() {
-    var Debugblocks = []; // 仅供测试
-    let BlockID = randomBlock(); // 随机抽取方块
-
+function changeBlocks() {
+    //var debugBlocks = []; // 仅供测试
+    let blockID = randomBlock(); // 随机抽取方块
 
     try {
-        overworld.runCommand(`fill 5 10 5 0 8 3 ${BlockID}`);
-        overworld.runCommand(`fill 0 8 2 2 10 0 ${BlockID}`);
-        console.log(`当前填充的方块ID: ${BlockID}`);
+        overworld.runCommand(`fill 5 10 5 0 8 3 ${blockID}`);
+        overworld.runCommand(`fill 0 8 2 2 10 0 ${blockID}`);
+        console.log(`当前填充的方块ID: ${blockID}`);
     }
     catch {
-        console.warn(`随机或指定的错误的方块ID: ${BlockID}`);
+        console.warn(`随机或指定的错误的方块ID: ${blockID}`);
         console.log(`将重新设置方块。`)
-        ChangeBlocks();
+        changeBlocks();
     };
-
 }
 
-
-
-function Init() {
-    if (InitFlag) return;
-    Timer = ChangeTimes;
-    InitFlag = true;
-    system.runInterval(() => Start(), 20); // 主循环
+function init() {
+    if (initFlag) return;
+    timer = changeTimes;
+    initFlag = true;
+    system.runInterval(() => start(), 20); // 主循环
 }
 
-function Start() {
-
-    let Progress = parseInt((ChangeTimes - Timer + 1) / ChangeTimes * 12); // 计算进度
-    let ProgressBar = "§m" + "█".repeat(12);
-    if(Progress < 0)
-        Progress = 0; // 防止溢出
-    if(Progress > 12)
-        Progress = 12;
+function start() {
+    const progressNum = 60; // 进度条长度
+    const progressChar = "∣"; // 进度条字符
+    let progress = parseInt((changeTimes - timer + 1) / changeTimes * progressNum); // 计算进度
+    let progressBar = "§m" + progressChar.repeat(progressNum);
+    if(progress < 0)
+        progress = 0; // 防止溢出
+    if(progress > progressNum)
+        progress = progressNum;
     try{ //防止 repeat 问题
-        ProgressBar = "§a" + "█".repeat(Progress) + "§f" + "█".repeat(12 - Progress);
+        progressBar = "§a" + progressChar.repeat(progress) + "§f" + progressChar.repeat(progressNum - progress);
     }
     catch(e){
         console.error(e);
-        console.warn(`进度: ${Progress}`);
+        console.warn(`进度: ${progress}`);
     }
-    overworld.runCommand(`titleraw @a actionbar {"rawtext": [{"text":"距离方块变换还有 ${Timer}/${ChangeTimes} 秒。\n${ProgressBar}"}]}`);
+    overworld.runCommand(`titleraw @a actionbar {"rawtext": [{"text":"距离方块变换还有 ${timer}/${changeTimes} 秒。\n${progressBar}"}]}`);
 
-    Timer -= 1;
-    if (Timer == -1) {
-        ChangeBlocks();
-        Timer = ChangeTimes;
+    timer -= 1;
+    if (timer == -1) {
+        changeBlocks();
+        timer = changeTimes;
     }
 };
 
-function teleportWindows(fromplayer, toplayer) {
-    let ACtionForm = new ActionFormData()
-    ACtionForm.title("这是窗口标题")
-        .body("窗口内容")
-        .button("选项1", "这里填材质的路径")
-        .button("选项2，调用函数", "textures/items/potato")
-        .button("选项3，调用函数", "textures/items/apple")
-        .button("密码验证", "textures/ui/gear")
-    ACtionForm.show(player).then(t => {
-        if (t.selection == 0) {
-            overworld.runCommandAsync(`say 这里是从0开始selection[0]代表是选项1`)
+world。beforeEvents。chatSend。subscribe((msg) => {
+    msg。cancel = true; // 取消默认聊天行为
+    let isSenderOp = true;//CheckIsOp(msg.sender); // 检查是否是管理员
+    if (msg。message == "#c") {
+        if (isSenderOp) {
+            timer = 0;
+            msg。sender。sendMessage("已重新随机生成方块。");
         }
-        if (t.selection == 1) {
-            overworld.runCommandAsync(`say 选项2`)
-            MessageFormTest(player)//调用函数MessageFormTest
-        } 
-        if (t.selection == 2) {
-            ModalFormTest(player)//调用函数ModalFormTest
+        else {
+            msg。sender。sendMessage("您不是管理员!");
         }
-        if (t.selection == 3) {
-            Verify(player)//调用函数Verify
+    }
+    if (msg。message。startsWith(`#next `)) {
+        if (isSenderOp) {
+            nextBlock = msg。message。substring(6)。trim();
+            if (nextBlock == "reset") {
+                nextBlock = null;
+                msg。sender。sendMessage("已取消设置下一个方块。");
+                return;
+            }
+            msg。sender。sendMessage(`成功设置下一个方块为 ${nextBlock}。`);
+        }
+        else {
+            msg。sender。sendMessage("您不是管理员!");
+        }
+    }
+    if (msg。message。startsWith(`#set `)) {
+        let newTimes = parseFloat(msg。message。substring(5)。trim()); // 获取新设置的时间
+        if (newTimes < 1 || newTimes > 65535) {
+            msg。sender。sendMessage(`参数值 ${newTimes} 出现问题，请输入 1 至 65,535 之间的整数（单位：秒）。`);
+            return;
+        }
+        changeTimes = newTimes;
+        timer = changeTimes;
+        world。sendMessage(`成功设置变化时间为 ${changeTimes} 秒。`);
+    }
+    if (msg。message。startsWith(`#timer `)) {
+        if (isSenderOp) {
+            let newTimer = parseFloat(msg。message。substring(7)。trim()); // 获取新设置的时间
+            if (newTimer < 1 || newTimer > 65535) {
+                msg。sender。sendMessage(`参数值 ${newTimer} 出现问题，请输入 1 至 65,535 之间的整数（单位：秒）。`);
+                return;
+            }
+            timer = newTimer;
+            world。sendMessage(`成功设置计时器时间为 ${newTimer} 秒。`);
+        }
+        else {
+            msg。sender。sendMessage("您不是管理员!");
+        }
+    }
+    if (msg。message。trim() == `#tp`){
+        system。runTimeout(()=>{
+            uiManager。closeAllForms(msg。sender);
+            toTeleport(msg。sender);
+        }，10);
+    }
+});
+
+function allowTeleportWindows(fromPlayer， toPlayer) {
+    let messageForm = new MessageFormData()
+    messageForm。title("申请传送通知")
+        。body(`${fromPlayer。nameTag} 将要传送到您的位置。`)
+        。button1("同意")
+        。button2("取消")
+    messageForm。show(toPlayer)。then((t) => {
+        if (t。selection == 0) {
+            overworld。runCommand(`tp ${fromPlayer。nameTag} ${toPlayer。nameTag}`);
+            console。log(`tp ${fromPlayer。nameTag} ${toPlayer。nameTag}`);
         }
     })
 };
 
-function CheckIsOp(player) { // 这个函数用于检测玩家是否是管理员，非管理员不能用 #c、#next 指令
-    return 1;
-}
+function toTeleport(player) {
+    let playerList = world。getAllPlayers();
+    let playerNameList = playerList。map(pt => pt。nameTag);
+    let teleportWindow = new ActionFormData()
+    teleportWindow。title("传送 §t§lBy yrzd6")
+        。body("请选择您要传送到的玩家: ")
 
+    playerNameList。forEach(playerT => {
+        teleportWindow。button(playerT， "textures/ui/gear");
+    });
+    teleportWindow。show(player)。then(t => {
+        allowTeleportWindows(player， playerList[t。selection]);
+    });
+};
 
-world.beforeEvents.chatSend.subscribe((msg) => {
-    let IsSenderOp = CheckIsOp(msg.sender); // 检查是否是管理员
-    if (msg.message == "#c") {
-        msg.cancel = true;
-        if (IsSenderOp) {
-            Timer = 0;
-            msg.sender.sendMessage("已重新随机生成方块。");
-        }
-        else {
-            msg.sender.sendMessage("您不是管理员!");
-        }
-    }
-    if (msg.message.startsWith(`#next `)) {
-        msg.cancel = true;
-        if (IsSenderOp) {
-            nextBlock = msg.message.substring(6).trim();
-            if (nextBlock == "reset") {
-                nextBlock = null;
-                msg.sender.sendMessage("已取消设置下一个方块。");
-                return;
-            }
-            msg.sender.sendMessage(`成功设置下一个方块为 ${nextBlock}。`);
-        }
-        else {
-            msg.sender.sendMessage("您不是管理员!");
-        }
-
-    }
-    if (msg.message.startsWith(`#set `)) {
-        msg.cancel = true;
-        let NewTimes = parseFloat(msg.message.substring(5).trim()); // 获取新设置的时间
-        if (NewTimes < 1 || NewTimes > 65535) {
-            msg.sender.sendMessage(`参数值 ${NewTimes} 出现问题，请输入 1 至 65,535 之间的整数（单位：秒）。`);
-            return;
-        }
-        ChangeTimes = NewTimes;
-        Timer = ChangeTimes;
-        world.sendMessage(`成功设置变化时间为 ${ChangeTimes} 秒。`);
-    }
-    if (msg.message.startsWith(`#timer `)) {
-        msg.cancel = true;
-        if (IsSenderOp) {
-            let NewTimer = parseFloat(msg.message.substring(7).trim()); // 获取新设置的时间
-            if (NewTimer < 1 || NewTimer > 65535) {
-                msg.sender.sendMessage(`参数值 ${NewTimer} 出现问题，请输入 1 至 65,535 之间的整数（单位：秒）。`);
-                return;
-            }
-            Timer = NewTimer;
-            world.sendMessage(`成功设置计时器时间为 ${NewTimer} 秒。`);
-        }
-        else {
-            msg.sender.sendMessage("您不是管理员!");
-        }
-    }
-});
-
-
-system.runTimeout(() => Init(), 8);
+system。runTimeout(() => init()， 10);
