@@ -1,6 +1,8 @@
 # Random Skyblock
 MinecraftBE ScriptAPI Random Skyblock.
 
+新版本不可用。
+
 ## 使用
 
 1. 打开 `测试版API`。
